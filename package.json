@@ -1,0 +1,29 @@
+{
+  "name": "brand-identity-design-system",
+  "version": "0.1.0",
+  "description": "Brand Identity Design System - Monorepo with React Frontend and Express Backend",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:backend\"",
+    "dev:client": "npm run dev --prefix client",
+    "dev:backend": "npm run dev --prefix backend",
+    "build": "npm run build:client && npm run build:backend",
+    "build:client": "npm run build --prefix client",
+    "build:backend": "npm run build --prefix backend",
+    "install:all": "npm install && npm install --prefix client && npm install --prefix backend",
+    "clean": "rm -rf client/node_modules backend/node_modules node_modules client/dist backend/dist",
+    "start": "concurrently \"npm run preview --prefix client\" \"npm start --prefix backend\""
+  },
+  "keywords": [
+    "react",
+    "typescript",
+    "express",
+    "supabase",
+    "monorepo"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
