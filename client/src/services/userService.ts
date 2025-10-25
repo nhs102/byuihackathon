@@ -1,30 +1,59 @@
-// PLACEHOLDER - hyun 담당 서비스 (사용자 관련 API)
-// 이 파일은 hyun이 실제 코드로 교체할 예정
+import { supabase } from './supabaseClient';
 
-export const userService = {
-  // 사용자 관련 API 함수들이 hyun에 의해 구현될 예정
-  getUserTasks: async (userId: string) => {
-    console.log('Placeholder userService.getUserTasks called with:', userId);
-    return { success: true, data: [], message: 'Placeholder by Hyun' };
-  },
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+}
 
-  startTask: async (taskId: string) => {
-    console.log('Placeholder userService.startTask called with:', taskId);
-    return { success: true, message: 'Placeholder by Hyun' };
-  },
+export async function loginUser(email: string): Promise<{ success: boolean; user?: User; error?: string }> {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
 
-  completeTask: async (taskId: string) => {
-    console.log('Placeholder userService.completeTask called with:', taskId);
-    return { success: true, message: 'Placeholder by Hyun' };
-  },
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return { success: false, error: 'Invalid email' };
+      }
+      return { success: false, error: error.message };
+    }
 
-  getRankings: async (roleModelId?: string) => {
-    console.log('Placeholder userService.getRankings called with:', roleModelId);
-    return { success: true, data: [], message: 'Placeholder by Hyun' };
-  },
-
-  cancelSchedule: async (userId: string) => {
-    console.log('Placeholder userService.cancelSchedule called with:', userId);
-    return { success: true, message: 'Placeholder by Hyun' };
+    return { success: true, user: data };
+  } catch (error) {
+    return { success: false, error: 'An error occurred during login' };
   }
-};
+}
+
+export async function registerUser(email: string, name: string): Promise<{ success: boolean; user?: User; error?: string }> {
+  try {
+    // Check if user already exists
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    if (existingUser) {
+      return { success: false, error: 'Email already exists' };
+    }
+
+    // Create new user
+    const { data, error } = await supabase
+      .from('users')
+      .insert([{ email, name }])
+      .select()
+      .single();
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, user: data };
+  } catch (error) {
+    return { success: false, error: 'An error occurred during registration' };
+  }
+}
+
